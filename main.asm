@@ -45,7 +45,7 @@ menuOperation db "Opt: Sum:s Subtract:r Multiplication:m Back to main menu:x",13
 resultString db "Wowwww, the result is: ",0 
 infoInputNumbers db "Enter a three digit number, followed by the enter key: ",0
 subAlert db "Negative result. Please try again.", 13,10,0        
-warningMsg db "Hey prof: This is a humble calculator, max result is 255.", 13, 10, 0
+warningMsg db "Hey prof: This is a humble calculator, max result is 255.", 13, 10, 0   
 
 ; Algunas funciones utiles
 PrintCharacter:
@@ -273,7 +273,575 @@ calFunction:
         jmp continueOperations
 
 ART:
-    ;Su codigo
+   
+    mov ax, 0003h
+    int 10h
+
     
+    mov dh, 0      
+    mov si, 30     
+
+dibujar_fondo:
+    mov ah, 02h
+    mov bh, 0
+    mov dl, 25     
+    int 10h
+
+    mov ah, 09h
+    mov al, ' '    
+    mov bh, 0
+    mov bl, 0F0h   
+    mov cx, 30 
+    int 10h
+    
+    inc dh         
+    dec si   
+    cmp si, 0  
+    jne dibujar_fondo
+    
+    ;Dibujar a Ado
+
+    ; --- Fila 1 ---
+    mov dh, 1
+    mov dl, 37 
+    mov bl, 00h 
+    mov si, 7 
+    call DibujarSegmento
+
+    ; --- Fila 2 ---
+    mov dh, 2
+    mov dl, 35 
+    mov bl, 00h 
+    mov si, 2 
+    call DibujarSegmento 
+    
+    mov dl, 37 
+    mov bl, 01h 
+    mov si, 7 
+    call DibujarSegmento 
+    
+    mov dl, 44 
+    mov bl, 00h 
+    mov si, 2 
+    call DibujarSegmento 
+
+    ; --- Fila 3 ---
+    mov dh, 3
+    mov dl, 34 
+    mov bl, 00h 
+    mov si, 1 
+    call DibujarSegmento 
+    
+    mov dl, 35 
+    mov bl, 01h 
+    mov si, 11
+    call DibujarSegmento 
+    
+    mov dl, 46 
+    mov bl, 00h 
+    mov si, 1 
+    call DibujarSegmento 
+
+    ; --- Fila 4 ---
+    mov dh, 4
+    mov dl, 33 
+    mov bl, 00h 
+    mov si, 1 
+    call DibujarSegmento 
+    
+    mov dl, 34 
+    mov bl, 01h 
+    mov si, 13
+    call DibujarSegmento 
+    
+    mov dl, 47 
+    mov bl, 00h 
+    mov si, 1 
+    call DibujarSegmento 
+
+    ; --- Fila 5 ---
+    mov dh, 5
+    mov dl, 33 
+    mov bl, 00h 
+    mov si, 1 
+    call DibujarSegmento 
+    
+    mov dl, 34 
+    mov bl, 01h 
+    mov si, 13
+    call DibujarSegmento 
+    
+    mov dl, 47 
+    mov bl, 00h 
+    mov si, 1 
+    call DibujarSegmento 
+
+    ; --- Fila 6 ---
+    mov dh, 6
+    mov dl, 32 
+    mov bl, 00h 
+    mov si, 1 
+    call DibujarSegmento 
+    
+    mov dl, 33 
+    mov bl, 01h 
+    mov si, 9 
+    call DibujarSegmento 
+    
+    mov dl, 42 
+    mov bl, 00h 
+    mov si, 2 
+    call DibujarSegmento 
+    
+    mov dl, 44 
+    mov bl, 01h 
+    mov si, 4 
+    call DibujarSegmento 
+    
+    mov dl, 48 
+    mov bl, 00h 
+    mov si, 1 
+    call DibujarSegmento 
+
+    ; --- Fila 7 ---
+    mov dh, 7
+    mov dl, 32 
+    mov bl, 00h 
+    mov si, 1 
+    call DibujarSegmento 
+    
+    mov dl, 33 
+    mov bl, 01h 
+    mov si, 8 
+    call DibujarSegmento 
+    
+    mov dl, 41 
+    mov bl, 00h 
+    mov si, 1 
+    call DibujarSegmento 
+    
+    mov dl, 42 
+    mov bl, 07h 
+    mov si, 1 
+    call DibujarSegmento 
+    
+    mov dl, 43 
+    mov bl, 00h 
+    mov si, 1 
+    call DibujarSegmento 
+    
+    mov dl, 44 
+    mov bl, 01h 
+    mov si, 4 
+    call DibujarSegmento 
+    
+    mov dl, 48 
+    mov bl, 00h 
+    mov si, 1 
+    call DibujarSegmento 
+
+    ; --- Fila 8 ---
+    mov dh, 8
+    mov dl, 32 
+    mov bl, 00h 
+    mov si, 1 
+    call DibujarSegmento 
+    
+    mov dl, 33 
+    mov bl, 01h 
+    mov si, 8 
+    call DibujarSegmento 
+    
+    mov dl, 41 
+    mov bl, 00h 
+    mov si, 1 
+    call DibujarSegmento 
+    
+    mov dl, 42 
+    mov bl, 07h 
+    mov si, 1 
+    call DibujarSegmento 
+    
+    mov dl, 43 
+    mov bl, 00h 
+    mov si, 1 
+    call DibujarSegmento 
+    
+    mov dl, 44 
+    mov bl, 01h 
+    mov si, 4 
+    call DibujarSegmento 
+    
+    mov dl, 48 
+    mov bl, 00h 
+    mov si, 1 
+    call DibujarSegmento 
+
+    ; --- Fila 9 ---
+    mov dh, 9
+    mov dl, 31 
+    mov bl, 00h 
+    mov si, 1 
+    call DibujarSegmento 
+    
+    mov dl, 32 
+    mov bl, 01h 
+    mov si, 4 
+    call DibujarSegmento 
+    
+    mov dl, 36 
+    mov bl, 00h 
+    mov si, 1 
+    call DibujarSegmento 
+    
+    mov dl, 37 
+    mov bl, 01h 
+    mov si, 1 
+    call DibujarSegmento 
+    
+    mov dl, 38 
+    mov bl, 00h 
+    mov si, 3 
+    call DibujarSegmento 
+    
+    mov dl, 41 
+    mov bl, 07h 
+    mov si, 3 
+    call DibujarSegmento 
+    
+    mov dl, 44 
+    mov bl, 00h 
+    mov si, 2 
+    call DibujarSegmento 
+    
+    mov dl, 46 
+    mov bl, 01h 
+    mov si, 3 
+    call DibujarSegmento 
+    
+    mov dl, 49 
+    mov bl, 00h 
+    mov si, 1 
+    call DibujarSegmento 
+
+    ; --- Fila 10 ---
+    mov dh, 10
+    mov dl, 31 
+    mov bl, 00h 
+    mov si, 1 
+    call DibujarSegmento 
+    
+    mov dl, 32 
+    mov bl, 01h 
+    mov si, 3 
+    call DibujarSegmento 
+    
+    mov dl, 35 
+    mov bl, 00h 
+    mov si, 3 
+    call DibujarSegmento 
+    
+    mov dl, 38 
+    mov bl, 07h 
+    mov si, 2 
+    call DibujarSegmento 
+    
+    mov dl, 40 
+    mov bl, 00h 
+    mov si, 1 
+    call DibujarSegmento 
+    
+    mov dl, 41 
+    mov bl, 07h 
+    mov si, 2 
+    call DibujarSegmento 
+    
+    mov dl, 43 
+    mov bl, 03h 
+    mov si, 1 
+    call DibujarSegmento 
+    
+    mov dl, 44 
+    mov bl, 07h 
+    mov si, 1 
+    call DibujarSegmento 
+    
+    mov dl, 45 
+    mov bl, 00h 
+    mov si, 1 
+    call DibujarSegmento 
+    
+    mov dl, 46 
+    mov bl, 01h 
+    mov si, 3 
+    call DibujarSegmento 
+    
+    mov dl, 49 
+    mov bl, 00h 
+    mov si, 1 
+    call DibujarSegmento 
+
+    ; --- Fila 11 ---
+    mov dh, 11
+    mov dl, 31 
+    mov bl, 00h 
+    mov si, 1 
+    call DibujarSegmento 
+    
+    mov dl, 32 
+    mov bl, 01h 
+    mov si, 3 
+    call DibujarSegmento 
+    
+    mov dl, 35 
+    mov bl, 00h 
+    mov si, 1 
+    call DibujarSegmento 
+    
+    mov dl, 36 
+    mov bl, 07h 
+    mov si, 1 
+    call DibujarSegmento 
+    
+    mov dl, 37 
+    mov bl, 03h 
+    mov si, 1 
+    call DibujarSegmento 
+    
+    mov dl, 38 
+    mov bl, 07h 
+    mov si, 5 
+    call DibujarSegmento 
+    
+    mov dl, 43 
+    mov bl, 03h 
+    mov si, 1 
+    call DibujarSegmento 
+    
+    mov dl, 44 
+    mov bl, 07h 
+    mov si, 1 
+    call DibujarSegmento 
+    
+    mov dl, 45 
+    mov bl, 00h 
+    mov si, 1 
+    call DibujarSegmento 
+    
+    mov dl, 46 
+    mov bl, 01h 
+    mov si, 3 
+    call DibujarSegmento 
+    
+    mov dl, 49 
+    mov bl, 00h 
+    mov si, 1 
+    call DibujarSegmento 
+
+    ; --- Fila 12 ---
+    mov dh, 12
+    mov dl, 31 
+    mov bl, 00h 
+    mov si, 1 
+    call DibujarSegmento 
+    
+    mov dl, 32 
+    mov bl, 01h 
+    mov si, 3 
+    call DibujarSegmento 
+    
+    mov dl, 35 
+    mov bl, 00h 
+    mov si, 1 
+    call DibujarSegmento 
+    
+    mov dl, 36 
+    mov bl, 07h 
+    mov si, 1 
+    call DibujarSegmento 
+    
+    mov dl, 37 
+    mov bl, 03h 
+    mov si, 1 
+    call DibujarSegmento 
+    
+    mov dl, 38 
+    mov bl, 07h 
+    mov si, 5 
+    call DibujarSegmento 
+    
+    mov dl, 43 
+    mov bl, 03h 
+    mov si, 1 
+    call DibujarSegmento 
+    
+    mov dl, 44 
+    mov bl, 07h 
+    mov si, 1 
+    call DibujarSegmento 
+    
+    mov dl, 45 
+    mov bl, 00h 
+    mov si, 1 
+    call DibujarSegmento 
+    
+    mov dl, 46 
+    mov bl, 01h 
+    mov si, 3 
+    call DibujarSegmento 
+    
+    mov dl, 49 
+    mov bl, 00h 
+    mov si, 1 
+    call DibujarSegmento 
+
+    ; --- Fila 13 ---
+    mov dh, 13
+    mov dl, 32 
+    mov bl, 00h 
+    mov si, 1 
+    call DibujarSegmento 
+    
+    mov dl, 33 
+    mov bl, 01h 
+    mov si, 2 
+    call DibujarSegmento 
+    
+    mov dl, 35 
+    mov bl, 00h 
+    mov si, 1 
+    call DibujarSegmento 
+    
+    mov dl, 36 
+    mov bl, 07h 
+    mov si, 9 
+    call DibujarSegmento 
+    
+    mov dl, 45 
+    mov bl, 00h 
+    mov si, 1 
+    call DibujarSegmento 
+    
+    mov dl, 46 
+    mov bl, 01h 
+    mov si, 2 
+    call DibujarSegmento 
+    
+    mov dl, 48 
+    mov bl, 00h 
+    mov si, 1 
+    call DibujarSegmento 
+
+    ; --- Fila 14 ---
+    mov dh, 14
+    mov dl, 32 
+    mov bl, 00h 
+    mov si, 1 
+    call DibujarSegmento 
+    
+    mov dl, 33 
+    mov bl, 01h 
+    mov si, 3 
+    call DibujarSegmento 
+    
+    mov dl, 36 
+    mov bl, 00h 
+    mov si, 1 
+    call DibujarSegmento 
+    
+    mov dl, 37 
+    mov bl, 07h 
+    mov si, 7 
+    call DibujarSegmento 
+    
+    mov dl, 44 
+    mov bl, 00h 
+    mov si, 1 
+    call DibujarSegmento 
+    
+    mov dl, 45 
+    mov bl, 01h 
+    mov si, 3 
+    call DibujarSegmento 
+    
+    mov dl, 48 
+    mov bl, 00h 
+    mov si, 1 
+    call DibujarSegmento 
+
+    ; --- Fila 15 ---
+    mov dh, 15
+    mov dl, 32 
+    mov bl, 00h 
+    mov si, 1 
+    call DibujarSegmento 
+    
+    mov dl, 33 
+    mov bl, 01h 
+    mov si, 2 
+    call DibujarSegmento 
+    
+    mov dl, 35 
+    mov bl, 00h 
+    mov si, 11
+    call DibujarSegmento 
+    
+    mov dl, 46 
+    mov bl, 01h 
+    mov si, 2 
+    call DibujarSegmento 
+    
+    mov dl, 48 
+    mov bl, 00h 
+    mov si, 1 
+    call DibujarSegmento 
+
+    ; --- Fila 16 ---
+    mov dh, 16
+    mov dl, 33 
+    mov bl, 00h 
+    mov si, 3 
+    call DibujarSegmento 
+    
+    mov dl, 45 
+    mov bl, 00h 
+    mov si, 4 
+    call DibujarSegmento 
+
+    ; --- Terminar y Esperar tecla ---
+    mov ah, 00h
+    int 16h
+    
+    ;Limpiar la pantalla antes de volver para resetear colores
+    mov ax, 0003h
+    int 10h
+
+    ;Asegurarnos de que el atributo de color vuelva a ser normal
+    mov ah, 09h
+    mov al, ' '    
+    mov bh, 0
+    mov bl, 07h
+    mov cx, 2000 
+    int 10h
+
     jmp continuePrincipal
-    ;parapapapapapararapapapapa 
+
+
+; Funcion para pintar multiples bloques
+DibujarSegmento:
+    ; Guardamos DH/DL
+    mov ah, 02h
+    mov bh, 0
+    int 10h  
+    
+    ; Pintamos carácter con atributo
+    mov ah, 09h    
+    mov al, 219    
+    mov cx, 1      
+    int 10h
+    
+    inc dl             
+    dec si             
+    cmp si, 0          
+    jne DibujarSegmento
+ret                
