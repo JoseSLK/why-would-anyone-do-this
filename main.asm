@@ -1,9 +1,9 @@
-; Heyyyy
+; Heyyyy - Version Compatible con Restricciones del Taller
 org 100h   
     mov si, offset warningMsg
     call PrintString
          
-   ;Imprimo los nombre primero (Flujo Principal)
+   ;Imprimo los nombres primero (Flujo Principal)
    mov si, offset nicolas
    call PrintString                                    
    
@@ -15,7 +15,7 @@ continuePrincipal:
     ; Imprimimos el menu
    mov si, offset menu
    call PrintString 
-   ; Esperamos al entrada
+   ; Esperamos entrada
    mov ah, 0
    int 16h
    
@@ -37,7 +37,10 @@ exitProgram:
    
    
 ret    
-; Algunas variables
+
+; ============================================
+; VARIABLES Y DATOS
+; ============================================
 nicolas db "Nicolas Tinjaca 202210716",13,10,0    
 jose db "Jose Salamanca 202214283",13,10,0
 menu db "Opt: 1:Calc 2:ART 3:Byeee",13,10,0 
@@ -47,237 +50,281 @@ infoInputNumbers db "Enter a three digit number, followed by the enter key: ",0
 subAlert db "Negative result. Please try again.", 13,10,0        
 warningMsg db "Hey prof: This is a humble calculator, max result is 255.", 13, 10, 0   
 
-; Algunas funciones utiles
+; ============================================
+; FUNCIONES BASICAS DE IMPRESION
+; ============================================
 PrintCharacter:
     mov ah, 0eh
     int 10h
 ret
+
 PrintString:
     mov ah, 0eh
-    stringLoop:    
-        mov al, [si]
-        cmp al, 0
-        je finLoop
-        int 10h
-        inc si
-        jmp stringLoop
-    finLoop: 
+stringLoop:    
+    mov al, [si]
+    cmp al, 0
+    je finLoop
+    int 10h
+    inc si
+    jmp stringLoop
+finLoop: 
 ret
 
+; ============================================
+; PRINTNUMBER SIN DIV - Usa restas repetitivas
+; Entrada: AL = numero a imprimir (0-255)
+; ============================================
 PrintNumber:
-    ; 1. Obtener Centenas
-    mov ah, 0         
-    mov bl, 100
-    div bl             ; AL = Cociente (Centenas), AH = Residuo (Resto)
+    mov cl, al         ; CL = numero original (se modificara)
     
-    mov dl, ah         ; Guardamos el residuo
-    cmp al, 0       
-    je decenas         ; Si es 0, no imprimimos nada y pasamos a las decenas
+    ; 1. Extraer centenas (dividir por 100 via restas)
+    mov bl, 0          ; BL = contador de centenas
     
+centenas_loop:
+    cmp cl, 100
+    jb print_centenas  ; Si CL < 100, no cabe mas
+    sub cl, 100        ; Restar 100
+    inc bl             ; Contar una centena
+    jmp centenas_loop
+    
+print_centenas:
+    ; BL = centenas, CL = residuo (0-99)
+    cmp bl, 0
+    je decenas         ; Si no hay centenas, saltar a decenas
+    
+    mov al, bl
     add al, '0'        ; Convertir a ASCII
     mov ah, 0eh
-    int 10h            ; Imprimir la centena 
+    int 10h            ; Imprimir centena
 
-    decenas:
-        ; 2. Obtener Decenas
-        mov al, dl         ; Traemos lo que quedó (decenas y unidades)
-        mov ah, 0
-        mov bl, 10
-        div bl             ; AL = Cociente (Decenas), AH = Residuo (Unidades)
-        
-        mov dl, ah         ; Guardamos las unidades en DL
-        
-        add al, '0'        ; Convertir a ASCII
-        mov ah, 0eh
-        int 10h            ; Imprimir la decena
+decenas:
+    ; 2. Extraer decenas (dividir residuo por 10)
+    mov bl, 0          ; BL = contador de decenas
     
-    unidades:
-        ; 3. Obtener Unidades
-        mov al, dl         ; Traemos el último residuo
-        add al, '0'        ; Convertir a ASCII
-        mov ah, 0eh
-        int 10h            ; Imprimir la unidad
+decenas_loop:
+    cmp cl, 10
+    jb print_decenas   ; Si CL < 10, terminar
+    sub cl, 10         ; Restar 10
+    inc bl             ; Contar una decena
+    jmp decenas_loop
+    
+print_decenas:
+    mov al, bl
+    add al, '0'        ; Convertir a ASCII
+    mov ah, 0eh
+    int 10h            ; Imprimir decena (incluso si es 0)
+    
+    ; 3. Imprimir unidades (quedan en CL)
+    mov al, cl
+    add al, '0'        ; Convertir a ASCII
+    mov ah, 0eh
+    int 10h            ; Imprimir unidad
 
 ret
 
+; ============================================
+; ENTERNUMBERS SIN MUL - Multiplica por 10 via sumas
+; ============================================
 EnterNumbers:
-    
     mov si, offset infoInputNumbers
     call PrintString
     
-    mov bl, 0 ;RESULTADO FINAL
-    mov cl, 0 ;Contador
+    mov bl, 0          ; RESULTADO FINAL
+    mov cl, 0          ; Contador de digitos
     
-    loopNumbers:
-        
-        ; Entrada
-        mov ah, 0
-        int 16h
-        
-        ;Esta monda es un enter?Si, si, se sale
-        cmp al, 13
-        je exitInput                              
-        
-        ;Es un numero es un caracter numero?
-        ;Depende del assci, si no pertenece a un numero, paila
-        cmp al, '0'
-        jl loopNumbers
-        
-        ;Lo mismo, pero con el limite superior
-        cmp al, '9'
-        jg loopNumbers                        
-        
-        ;Imprime la entrada       
-        mov ah, 0eh
-        int 10h
-         
-        ;Primero convierto el caracter en numero real
-        sub al, '0'
-        ;guardo la entrada en dl
-        mov dl, al
-        
-        ;Ahora, traigo el total actual
-        mov al, bl ; 
-        mov dh, 10
-        mul dh ; Multiplico lo que esta en al por 10
-        
-        add al, dl ; Se suma el nuevo digito
-        mov bl, al ; Guardo el nuevo digito en bl
-        
-        inc cl ; Incremento el contador para ver cuantas cifras vamos
-        cmp cl, 3 ; Si vamos tres cifras, se termina el loop
-        je exitInput
-        
-        jmp loopNumbers
+loopNumbers:
+    ; Entrada
+    mov ah, 0
+    int 16h
     
-    exitInput:
+    ;Es un enter? Si, se sale
+    cmp al, 13
+    je exitInput                              
+    
+    ;Validar que sea numero (0-9)
+    cmp al, '0'
+    jl loopNumbers
+    cmp al, '9'
+    jg loopNumbers                        
+    
+    ;Imprimir la entrada       
+    mov ah, 0eh
+    int 10h
+     
+    ;Convertir ASCII a numero
+    sub al, '0'
+    mov dl, al         ; Guardar digito nuevo en DL
+    
+    ;MULTIPLICAR BL POR 10 usando solo ADD
+    ;Numero * 10 = Numero sumado 10 veces
+    mov ch, 10         ; Contador de sumas
+    mov al, bl         ; AL = valor actual (a multiplicar)
+    mov bl, 0          ; BL = acumulador (resetear a 0)
+    
+multiply_loop:
+    add bl, al         ; Sumar valor original
+    dec ch             ; Decrementar contador
+    cmp ch, 0
+    jne multiply_loop  ; Si aun no es 0, seguir sumando
+    
+    ;Ahora sumar el nuevo digito
+    add bl, dl         ; BL = (BL * 10) + digito_nuevo
+    
+    inc cl             ; Incrementar contador de digitos
+    cmp cl, 3          ; Si ya van 3 cifras, terminar
+    je exitInput
+    
+    jmp loopNumbers
+
+exitInput:
     mov al, 13
     call PrintCharacter
     mov al, 10
     call PrintCharacter
-
 ret
 
-; La calculadora Humilde
+; ============================================
+; CALCULADORA
+; ============================================
 calFunction:
-    continueOperations:           
-        mov si, offset menuOperation
-        call PrintString
-        ;Las opciones de la calculadora
-        mov ah, 0
-        int 16h
-        ;Lo que se debe ejecutar
-        cmp al, 's'
-        je Sums
-        cmp al, 'r'
-        je Subtractions
-        cmp al, 'm'    
-        je Multiplications
-        cmp al, 'x'
-        je continuePrincipal
-        
-        jmp continueOperations
-       
-     Sums:
-        call EnterNumbers
-        mov bh, bl
-        
-        mov al, "+"       
-        call PrintCharacter 
-        mov al, 13
-        call PrintCharacter
-        mov al, 10
-        call PrintCharacter
-          
-        call EnterNumbers
-        
-        add bh, bl
-        
-        mov si, offset resultString
-        call PrintString
-        
-        mov al, bh
-        call PrintNumber
-               
-        mov al, 13
-        call PrintCharacter
-        mov al, 10
-        call PrintCharacter
-        
-        
-        jmp continueOperations
-        
-     Subtractions:
-        call EnterNumbers
-        mov bh, bl
-        
-        mov al, "-"       
-        call PrintCharacter 
-        mov al, 13
-        call PrintCharacter
-        mov al, 10
-        call PrintCharacter
-          
-        call EnterNumbers
-        
-        cmp bh, bl
-        jl alertImpossible
-        
-        sub bh, bl
-        
-        mov si, offset resultString
-        call PrintString
-        
-        mov al, bh
-        call PrintNumber
-               
-        mov al, 13
-        call PrintCharacter
-        mov al, 10
-        call PrintCharacter
-         
-         alertImpossible:
-            mov si, offset subAlert
-            call PrintString
-        
-        jmp continueOperations
-     Multiplications:
-        call EnterNumbers
-        mov bh, bl
-        
-        mov al, "*"       
-        call PrintCharacter 
-        mov al, 13
-        call PrintCharacter
-        mov al, 10
-        call PrintCharacter
-          
-        call EnterNumbers
-        
-        mov al, bh
-        mul bl
-        
-        mov bh, al
-        
-        mov si, offset resultString
-        call PrintString
-        
-        mov al, bh
-        call PrintNumber
-               
-        mov al, 13
-        call PrintCharacter
-        mov al, 10
-        call PrintCharacter
-        
-        jmp continueOperations
-
-ART:
+continueOperations:           
+    mov si, offset menuOperation
+    call PrintString
+    
+    ;Leer opcion
+    mov ah, 0
+    int 16h
+    
+    ;Validar opciones
+    cmp al, 's'
+    je Sums
+    cmp al, 'r'
+    je Subtractions
+    cmp al, 'm'    
+    je Multiplications
+    cmp al, 'x'
+    je continuePrincipal
+    
+    jmp continueOperations
    
+Sums:
+    call EnterNumbers
+    mov bh, bl         ; Primer numero en BH
+    
+    mov al, "+"       
+    call PrintCharacter 
+    mov al, 13
+    call PrintCharacter
+    mov al, 10
+    call PrintCharacter
+      
+    call EnterNumbers  ; Segundo numero en BL
+    
+    add bh, bl         ; Sumar
+    
+    mov si, offset resultString
+    call PrintString
+    
+    mov al, bh
+    call PrintNumber
+           
+    mov al, 13
+    call PrintCharacter
+    mov al, 10
+    call PrintCharacter
+    
+    jmp continueOperations
+    
+Subtractions:
+    call EnterNumbers
+    mov bh, bl         ; Primer numero en BH
+    
+    mov al, "-"       
+    call PrintCharacter 
+    mov al, 13
+    call PrintCharacter
+    mov al, 10
+    call PrintCharacter
+      
+    call EnterNumbers  ; Segundo numero en BL
+    
+    cmp bh, bl
+    jl alertImpossible ; Si BH < BL, resultado negativo (no permitido)
+    
+    sub bh, bl         ; Restar
+    
+    mov si, offset resultString
+    call PrintString
+    
+    mov al, bh
+    call PrintNumber
+           
+    mov al, 13
+    call PrintCharacter
+    mov al, 10
+    call PrintCharacter
+     
+    jmp continueOperations
+    
+alertImpossible:
+    mov si, offset subAlert
+    call PrintString
+    jmp continueOperations
+
+; ============================================
+; MULTIPLICACION SIN MUL - Usa sumas repetitivas
+; ============================================
+Multiplications:
+    call EnterNumbers
+    mov bh, bl         ; Primer numero en BH
+    
+    mov al, "*"       
+    call PrintCharacter 
+    mov al, 13
+    call PrintCharacter
+    mov al, 10
+    call PrintCharacter
+      
+    call EnterNumbers  ; Segundo numero en BL
+    
+    ;MULTIPLICACION via sumas: BH * BL
+    ;Si BL es 0, resultado es 0
+    mov al, bh         ; AL = multiplicando (primer numero)
+    mov ch, bl         ; CH = multiplicador/contador (segundo numero)
+    mov bl, 0          ; BL = acumulador del resultado (inicia en 0)
+    
+    cmp ch, 0          ; Si multiplicador es 0, resultado es 0
+    je multi_done
+    
+multi_loop:
+    add bl, al         ; Sumar multiplicando al resultado
+    dec ch             ; Decrementar contador
+    cmp ch, 0
+    jne multi_loop     ; Mientras no sea 0, seguir sumando
+    
+multi_done:
+    mov bh, bl         ; Mover resultado a BH para imprimir
+    
+    mov si, offset resultString
+    call PrintString
+    
+    mov al, bh
+    call PrintNumber
+           
+    mov al, 13
+    call PrintCharacter
+    mov al, 10
+    call PrintCharacter
+    
+    jmp continueOperations
+
+; ============================================
+; ASCII ART (Sin cambios, ya cumple restricciones)
+; ============================================
+ART:
     mov ax, 0003h
     int 10h
 
-    
     mov dh, 0      
     mov si, 30     
 
@@ -299,8 +346,8 @@ dibujar_fondo:
     cmp si, 0  
     jne dibujar_fondo
     
-    ;Dibujar a Ado
-
+    ;Dibujar figura pixel por pixel usando colores
+    
     ; --- Fila 1 ---
     mov dh, 1
     mov dl, 37 
@@ -812,11 +859,11 @@ dibujar_fondo:
     mov ah, 00h
     int 16h
     
-    ;Limpiar la pantalla antes de volver para resetear colores
+    ;Limpiar la pantalla antes de volver
     mov ax, 0003h
     int 10h
 
-    ;Asegurarnos de que el atributo de color vuelva a ser normal
+    ;Resetear colores a normal
     mov ah, 09h
     mov al, ' '    
     mov bh, 0
@@ -826,15 +873,12 @@ dibujar_fondo:
 
     jmp continuePrincipal
 
-
-; Funcion para pintar multiples bloques
+; Funcion para pintar multiples bloques de color
 DibujarSegmento:
-    ; Guardamos DH/DL
     mov ah, 02h
     mov bh, 0
     int 10h  
     
-    ; Pintamos carácter con atributo
     mov ah, 09h    
     mov al, 219    
     mov cx, 1      
@@ -844,4 +888,4 @@ DibujarSegmento:
     dec si             
     cmp si, 0          
     jne DibujarSegmento
-ret                
+ret
